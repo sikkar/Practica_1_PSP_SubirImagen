@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -45,29 +46,24 @@ public class Principal extends Activity {
         etUrl=(EditText)findViewById(R.id.etUrl);
         etGuardar=(EditText)findViewById(R.id.etGuardar);
         ivImagen = (ImageView)findViewById(R.id.ivImagen);
-    }
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_principal, menu);
-        return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+    protected void onSaveInstanceState(Bundle outState) {
+        BitmapDrawable drawable = (BitmapDrawable) ivImagen.getDrawable();
+        Bitmap bitmap = drawable.getBitmap();
+        outState.putParcelable("image", bitmap);
+        super.onSaveInstanceState(outState);
+    }
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        if(savedInstanceState != null) {
+            Bitmap bitmap = savedInstanceState.getParcelable("image");
+            ivImagen.setImageBitmap(bitmap);
         }
-
-        return super.onOptionsItemSelected(item);
+        super.onRestoreInstanceState(savedInstanceState);
     }
 
     public void descargar(View view){
@@ -105,7 +101,7 @@ public class Principal extends Activity {
             url = new URL(direccion);
             InputStream is = url.openStream();
             OutputStream os = new FileOutputStream(archivo);
-            byte[] b = new byte[1024];
+            byte[] b = new byte[2048];
             int length;
             while ((length = is.read(b)) != -1) {
                 os.write(b, 0, length);
